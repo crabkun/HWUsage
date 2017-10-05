@@ -27,12 +27,14 @@
 	<div class="ui grid">
 		<div class="ui row">
 			<div class="ui column sixteen wide" style="text-align: center">
+				<p></p>
 				<h2 class="ui header">CPU使用率</h2>
 				<div id="cpu-chart" style="width: 100%;height:400px;margin: 0 auto;"></div>
 			</div>
 		</div>
 		<div class="ui row">
 			<div class="ui column sixteen wide" style="text-align: center">
+				<div class="ui divider"></div>
 				<p></p>
 				<h2 class="ui header">内存使用率</h2>
 					<div class="ui statistic">
@@ -55,6 +57,28 @@
 					</div>
 			</div>
 		</div>
+		<div class="ui row">
+			<div class="ui column sixteen wide" style="text-align: center">
+				<div class="ui divider"></div>
+				<p></p>
+				<h2 class="ui header">硬盘使用情况</h2>
+				<table class="ui celled padded table">
+					<thead>
+						<tr>
+							<th class="single line">文件系统</th>
+							<th>容量</th>
+							<th>已用</th>
+							<th>可用</th>
+							<th>已用百分比</th>
+							<th>挂载点</th>
+						</tr>
+					</thead>
+					<tbody id="diskTable">
+
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 	<div class="ui active dimmer">
 		<div class="ui text loader">正在准备数据</div>
@@ -63,4 +87,5 @@
 </body>
 <script src="cpu.js"></script>
 <script src="mem.js"></script>
+<script src="disk.js"></script>
 </html>

@@ -1,5 +1,6 @@
 // 基于准备好的dom，初始化echarts实例
 var CpuChart = echarts.init(document.getElementById('cpu-chart'));
+var CpuChartData=[]
 // 指定图表的配置项和数据
 var CpuChartOption = {
 	color: ['#3398DB'],
@@ -28,7 +29,7 @@ var CpuChartOption = {
 		{
 			type : 'value',
 			min:0,
-			max:100
+			max:100,
 		}
 	],
 	series : [

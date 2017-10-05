@@ -20,7 +20,14 @@ type MemStat struct {
 	Total int
 	Used int
 }
-
+type DiskStat struct {
+	Name string
+	Size string
+	Used string
+	Free string
+	UseRate string
+	Mount string
+}
 func getCPU() []CPUStat {
 	t:=make([]CPUStat,0)
 	buf,err:=ioutil.ReadFile("/proc/stat")
@@ -51,13 +58,10 @@ func getCPU() []CPUStat {
 func getMem() MemStat {
 	t:=MemStat{}
 	cmd1:=exec.Command("free")
-	cmd2:=exec.Command("grep","Mem")
-	cmd3:=exec.Command("awk",`{print $2 " " $3}`)
+	cmd2:=exec.Command("awk",`{if($1~"Mem")print $2 " " $3}`)
 	cmd2.Stdin,_=cmd1.StdoutPipe()
-	cmd3.Stdin,_=cmd2.StdoutPipe()
 	cmd1.Start()
-	cmd2.Start()
-	output,err:=cmd3.CombinedOutput()
+	output,err:=cmd2.CombinedOutput()
 	if err!=nil{
 		return t
 	}
@@ -65,11 +69,36 @@ func getMem() MemStat {
 	fmt.Sscanf(outputStr,"%d%d",&t.Total,&t.Used)
 	return t
 }
+func getDisk() []DiskStat {
+	t:=make([]DiskStat,0)
+	cmd1:=exec.Command("df","-h")
+	cmd2:=exec.Command("awk",`{if($1~"/dev/")print}`)
+	cmd2.Stdin,_=cmd1.StdoutPipe()
+	cmd1.Start()
+	output,err:=cmd2.CombinedOutput()
+	if err!=nil{
+		return t
+	}
+	outputStr:=string(output)
+	strArr:=strings.Split(outputStr,"\n")
+	var n int
+	for _,v:=range strArr{
+		tmp:=DiskStat{}
+		if n,_=fmt.Sscanf(v,"%s %s %s %s %s %s",&tmp.Name,&tmp.Size,&tmp.Used,&tmp.Free,&tmp.UseRate,&tmp.Mount);n!=6{
+			continue
+		}
+		t=append(t,tmp)
+	}
+	return t
+}
 func GetCpuJSON(c *crab.Context){
 	c.WriteJSON(getCPU())
 }
 func GetMemJSON(c *crab.Context){
 	c.WriteJSON(getMem())
+}
+func GetDiskJSON(c *crab.Context){
+	c.WriteJSON(getDisk())
 }
 func GetPluginInfo() *MonitorKits.PluginInfo {
 	t:=&MonitorKits.PluginInfo{}
@@ -86,6 +115,7 @@ func GetPluginRoute() *MonitorKits.PluginRoute {
 	t:=&MonitorKits.PluginRoute{}
 	t.Add("GET","GetCpuJSON","GetCpuJSON")
 	t.Add("GET","GetMemJSON","GetMemJSON")
+	t.Add("GET","GetDiskJSON","GetDiskJSON")
 	return t
 }
 
